@@ -1,0 +1,39 @@
+{
+  "name": "nominalbot",
+  "version": "1.0.0",
+  "description": "",
+  "main": "bin/bot.js",
+  "dependencies": {
+    "@types/node": "^10.1.2",
+    "bufferutil": "^3.0.5",
+    "discord.js": "^11.3.2",
+    "erlpack": "github:discordapp/erlpack",
+    "install": "^0.11.0",
+    "libsodium-wrappers": "^0.7.3",
+    "node-gyp": "^3.6.2",
+    "node-opus": "^0.3.0",
+    "npm": "^6.1.0",
+    "typescript": "^2.8.3",
+    "typings": "^2.1.1",
+    "uws": "^10.148.0",
+    "windows-build-tools": "^2.3.0",
+    "youtube-search": "^1.1.1",
+    "ytdl-core": "^0.20.4",
+    "zlib-sync": "^0.1.4"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "tsc": "tsc",
+    "tsc:w": "tsc -t esnext -m commonjs src/bot.ts"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/toclean/cleandj.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/toclean/cleandj/issues"
+  },
+  "homepage": "https://github.com/toclean/cleandj#readme"
+}
