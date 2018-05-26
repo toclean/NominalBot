@@ -1,25 +1,18 @@
 import { Message, Client } from 'discord.js';
 
 // Command imports
-import { Command } from './commands/command'
+import { Command } from './models/command'
 import { Help } from './commands/help'
-import { VoiceHandler } from './commands/music/voiceHandler';
-import { MusicHandler } from './commands/music/musicHandler';
+import { VoiceHandler } from './music/voiceHandler';
+import { MusicHandler } from './music/musicHandler';
 
 // Create a voicehandler
 let voiceHandler = new VoiceHandler();
 
 // Create a musichandler
-let musicHandler = new MusicHandler();
+let musicHandler = new MusicHandler(voiceHandler);
 
 const { prefix }: { prefix: string } = require('../config.json')
-
-let commands = new Map<string, Command>
-([
-    ['help', new Help()],
-    ['voiceHandler', voiceHandler],
-    ['musicHandler', musicHandler]
-]);
 
 export class CommandHandler
 {
@@ -30,36 +23,37 @@ export class CommandHandler
 
         if (rawCommand.startsWith('add'))
         {
-            (commands.get('musicHandler')! as MusicHandler).AddSong(client, voiceHandler, message);
+            musicHandler.AddSong(client, musicHandler, message);
         }
         else if (rawCommand.startsWith('play'))
         {
-            (commands.get('musicHandler')! as MusicHandler).PlaySong(client, voiceHandler, message);
+            musicHandler.Play(client, musicHandler, message);
         }
 
         switch(rawCommand)
         {
             case 'help':
-                (commands.get('help')! as Help).GetHelp(commands);
                 break;
             case 'join':
-                (commands.get('voiceHandler')! as VoiceHandler).ConnectToVoiceChannel(message);
+                voiceHandler.ConnectToVoiceChannel(message);
                 break;
             case 'leave':
-                (commands.get('voiceHandler')! as VoiceHandler).LeaveVoiceChannel(message);
+                voiceHandler.LeaveVoiceChannel(message);
                 break;
             case 'stop':
-                (commands.get('musicHandler')! as MusicHandler).Stop(voiceHandler, message);
+                musicHandler.Stop(musicHandler, message);
                 break;
             case 'skip':
-                (commands.get('musicHandler')! as MusicHandler).SkipSong(voiceHandler, message);
+                musicHandler.Skip(musicHandler, message);
                 break;
             case 'pause':
-                (commands.get('musicHandler')! as MusicHandler).PauseSong(client, message);
+                musicHandler.Pause(client, musicHandler, message);
                 break;
             case 'resume':
-                (commands.get('musicHandler')! as MusicHandler).ResumeSong(client, message);
+                musicHandler.Resume(client, musicHandler, message);
                 break;
+            case 'replay':
+                musicHandler.Replay(musicHandler, message);
         }
     }
 }

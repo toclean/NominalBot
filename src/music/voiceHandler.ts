@@ -2,9 +2,6 @@ import { Message, Channel, VoiceChannel, VoiceConnection } from "discord.js";
 
 export class VoiceHandler
 {
-    name = "";
-    desc = "";
-
     public voiceChannel: VoiceChannel | undefined;
     public voiceConnection: VoiceConnection | undefined;
 
