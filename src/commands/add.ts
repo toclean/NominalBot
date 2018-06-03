@@ -12,8 +12,6 @@ export class Add implements Command
 
     public AddSong(client: Client, musicHandler: MusicHandler, message: Message): void
     {
-        // !!! Use shift to remove song !!!
-    
         let request = message.content.substring(message.content.indexOf(' ') + 1);
 
         if (request.includes('http') && request.includes('|'))

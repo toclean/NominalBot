@@ -5,7 +5,4 @@ export interface Command
 
     // Short description of the command
     desc: string;
-
-    // Function the command executes
-    exec?: any;
 }

@@ -9,9 +9,7 @@ export class Replay implements Command
 
     public Replay(musicHandler: MusicHandler, message: Message)
     {
-        if (!musicHandler) return;
-
-        if (!musicHandler.upNext) return;
+        if (!musicHandler || !musicHandler.upNext) return;
 
         if (musicHandler.upNext.replay)
         {
