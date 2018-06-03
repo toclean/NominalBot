@@ -113,7 +113,7 @@ function AddUpNext(request: string, client: Client, musicHandler: MusicHandler, 
         });
     }
 
-    if (musicHandler.upNext!.songs.length == 1)
+    if (!musicHandler.upNext!.playing && musicHandler.upNext!.songs.length == 1)
     {
         musicHandler.Play(client, musicHandler, message);
     }
