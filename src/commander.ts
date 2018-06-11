@@ -12,11 +12,11 @@ let voiceHandler = new VoiceHandler();
 // Create a musichandler
 let musicHandler = new MusicHandler(voiceHandler);
 
+// Read the prefix from the config file
 const { prefix }: { prefix: string } = require('../config.json')
 
 export class CommandHandler
 {
-    // Todo: add property that will hold voicehandler and musichandler?
     ProcessCommand(client: Client, message: Message): void
     {
         let rawCommand = message.content.substring(prefix.length).toLowerCase();

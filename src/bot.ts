@@ -8,13 +8,13 @@ import { CommandHandler } from './commander'
 const cmdHdlr = new CommandHandler();
 
 // Import secrets from config file
-const { botToken }: { botToken: string } = require('../config.json')
+const config = require('../config.json')
 
 // Create a discord client
 const client:Client = new Client();
 
 // Connect to the discord server/guild
-client.login(botToken);
+client.login(config.botToken);
 
 client.on('ready', () => {
     console.log(`Connected as ${client.user.username}!`);
@@ -22,7 +22,10 @@ client.on('ready', () => {
 
 client.on('message', (message: Message) => {
     if (message.author.bot) return;
-    if (!message.content.startsWith('.')) return;
+
+    let useablePrefix = config.prefix || '.';
+
+    if (!message.content.startsWith(useablePrefix)) return;
 
     cmdHdlr.ProcessCommand(client, message);
 });
