@@ -21,10 +21,17 @@
     "ytdl-core": "^0.20.4",
     "zlib-sync": "^0.1.4"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "@types/chai": "^4.1.3",
+    "@types/mocha": "^5.2.1",
+    "chai": "^4.1.2",
+    "mocha": "^5.2.0",
+    "ts-node": "^6.1.0"
+  },
   "scripts": {
     "tsc": "tsc",
-    "tsc:w": "tsc -t esnext -m commonjs src/bot.ts"
+    "tsc:w": "tsc -t esnext -m commonjs src/bot.ts",
+    "test": "mocha -r ts-node/register src/**/test.ts"
   },
   "repository": {
     "type": "git",

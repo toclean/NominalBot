@@ -10,22 +10,12 @@ export class Add implements Command
     name = 'add';
     desc = 'Adds a song to the queue';
 
-    public AddSong(client: Client, musicHandler: MusicHandler, message: Message): void
+    public AddSong(client: Client, musicHandler: MusicHandler, message: Message)
     {
         let request = message.content.substring(message.content.indexOf(' ') + 1);
 
-        if (request.includes('http') && request.includes('|'))
-        {
-            request.split('|').forEach(request => {
-                AddUpNext(request, client, musicHandler, message);
-            });
-        }
-        else
-        {
-            AddUpNext(request, client, musicHandler, message);
-        }
+        AddUpNext(request, client, musicHandler, message);
     }
-    
 }
 
 function AddUpNext(request: string, client: Client, musicHandler: MusicHandler, message: Message)
@@ -50,6 +40,8 @@ function AddUpNext(request: string, client: Client, musicHandler: MusicHandler, 
                     requester: message.author,
                     seek: 0
                 });
+
+                console.log(musicHandler.upNext.songs)
 
                 message.reply(`Added ${results[0].title} to queue`);
             }
@@ -80,34 +72,33 @@ function AddUpNext(request: string, client: Client, musicHandler: MusicHandler, 
         ytsearch(request, musicHandler.opts, function (error, results) {
             let options: Option[] = [];
 
-
-                if (!results || results.length < 1)
-                {
-                    message.reply('No search results found');
-                    return;
-                }
-                
-                for (var i = 0; i < musicHandler.opts.maxResults; i++) {
-                    options.push(
-                        {
-                            name: `${i + 1}. ${results[i].title}`,
-                            value: `[LINK](${results[i].link})`
-                        }
-                    );
-                }
-
-                message.reply({
-                    embed: {
-                        color: 3447004,
-                        title: 'Pick one from below',
-                        author: {
-                            name: message.client.user.username,
-                            icon_url: message.client.user.avatarURL
-                        },
-                        fields: options,
-                        timestamp: new Date()
+            if (!results || results.length < 1)
+            {
+                message.reply('No search results found');
+                return;
+            }
+            
+            for (var i = 0; i < musicHandler.opts.maxResults; i++) {
+                options.push(
+                    {
+                        name: `${i + 1}. ${results[i].title}`,
+                        value: `[LINK](${results[i].link})`
                     }
-                });
+                );
+            }
+
+            message.reply({
+                embed: {
+                    color: 3447004,
+                    title: 'Pick one from below',
+                    author: {
+                        name: message.client.user.username,
+                        icon_url: message.client.user.avatarURL
+                    },
+                    fields: options,
+                    timestamp: new Date()
+                }
+            });
 
             MusicHandler.choices = results;
         });
