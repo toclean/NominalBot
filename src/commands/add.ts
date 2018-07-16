@@ -5,23 +5,33 @@ import { Option } from "../models/music/option";
 import { Command } from "../models/command";
 import * as ytsearch from "youtube-search"
 
+let { debug }: { debug: boolean } = require('../../config.json');
+debug = (debug === true);
+
 export class Add implements Command
 {
     name = 'add';
     desc = 'Adds a song to the queue';
 
-    public AddSong(client: Client, musicHandler: MusicHandler, message: Message)
+    public async AddSong(client: Client, musicHandler: MusicHandler, message: Message)
     {
         let request = message.content.substring(message.content.indexOf(' ') + 1);
 
-        AddUpNext(request, client, musicHandler, message);
+        await AddUpNext(request, client, musicHandler, message);
+
+        return new Promise(function (resolve, reject) 
+        {
+            resolve();
+        });
     }
 }
 
-function AddUpNext(request: string, client: Client, musicHandler: MusicHandler, message: Message)
+async function AddUpNext(request: string, client: Client, musicHandler: MusicHandler, message: Message)
 {
     if (request.includes('http'))
     {
+        if (debug) console.log('Message contains a link');
+
         let id = request.split('=')[1];
 
         ytsearch(id, musicHandler.opts, function (error, results)
@@ -49,6 +59,8 @@ function AddUpNext(request: string, client: Client, musicHandler: MusicHandler, 
     }
     else if (parseInt(request) && parseInt(request) <= musicHandler.opts.maxResults && parseInt(request) > 0)
     {
+        if (debug) console.log('Message is a prompt for the user');
+
         if (!MusicHandler.choices || MusicHandler.choices.length < 1) return;
 
         let choice = MusicHandler.choices[parseInt(request) - 1];
@@ -69,6 +81,8 @@ function AddUpNext(request: string, client: Client, musicHandler: MusicHandler, 
     }
     else
     {
+        if (debug) console.log('Message contains a search');
+
         ytsearch(request, musicHandler.opts, function (error, results) {
             let options: Option[] = [];
 
@@ -108,4 +122,9 @@ function AddUpNext(request: string, client: Client, musicHandler: MusicHandler, 
     {
         musicHandler.Play(client, musicHandler, message);
     }
+
+    return new Promise(function (resolve, reject) 
+    {
+        resolve();
+    });
 }

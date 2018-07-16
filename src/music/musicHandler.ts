@@ -10,9 +10,9 @@ import { Stop } from "../commands/stop";
 import { Skip } from "../commands/skip";
 import { Resume } from "../commands/resume";
 import { Pause } from "../commands/pause";
-import { Replay } from  "../commands/replay"
+import { Replay } from  "../commands/replay";
 
-const { youtubeApi }: { youtubeApi: string } = require('../../config.json')
+const { youtubeApi }: { youtubeApi: string } = require('../../config.json');
 
 export class MusicHandler
 {
