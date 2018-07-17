@@ -15,6 +15,11 @@ mh.upNext = new UpNext();
 client.user = new ClientUser(client, {'id': '123'});
 client.users.set(client.user.id, client.user);
 
+let guild = new Guild(client, {'emojis': []});
+let channel = new TextChannel(guild, {});      
+let message = new Message(channel, {'content': ' https://www.youtube.com/watch?v=nYb2B7N1CKU', 'author': client.user, 'embeds': [], 'attachments': []}, client);
+
+
 describe('Adds a song to the queue', () => {
     it('array should be one larger', async () => {
         let startSize = mh.upNext!.songs.length;
@@ -24,5 +29,13 @@ describe('Adds a song to the queue', () => {
         await mh.AddSong(client, mh, new Message(channel, {'content': ' https://www.youtube.com/watch?v=nYb2B7N1CKU', 'author': client.user, 'embeds': [], 'attachments': []}, client));
 
         expect(startSize).to.not.eq(mh.upNext!.songs.length);
+    });
+});
+
+describe('Searching', () => 
+{
+    it('Content searching returns results', async () => 
+    {
+       mh.AddSong(client, mh, message);
     });
 });

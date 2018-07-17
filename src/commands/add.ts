@@ -8,6 +8,8 @@ import * as ytsearch from "youtube-search"
 let { debug }: { debug: boolean } = require('../../config.json');
 debug = (debug === true);
 
+let apiResults: Result[] = [];
+
 export class Add implements Command
 {
     name = 'add';
@@ -15,116 +17,57 @@ export class Add implements Command
 
     public async AddSong(client: Client, musicHandler: MusicHandler, message: Message)
     {
-        let request = message.content.substring(message.content.indexOf(' ') + 1);
+        let startSize = musicHandler.upNext!.songs.length;
 
-        await AddUpNext(request, client, musicHandler, message);
+        await querySong(message, musicHandler);
 
-        return new Promise(function (resolve, reject) 
+        return new Promise((resolve, reject) => 
         {
             resolve();
         });
     }
 }
 
-async function AddUpNext(request: string, client: Client, musicHandler: MusicHandler, message: Message)
+async function querySong(message: Message, musicHandler: MusicHandler)
 {
-    if (request.includes('http'))
+    if (Number.parseInt(message.content) && Number.parseInt(message.content) > 0 && Number.parseInt(message.content) <= musicHandler.opts.maxResults)
     {
-        if (debug) console.log('Message contains a link');
 
-        let id = request.split('=')[1];
-
-        ytsearch(id, musicHandler.opts, function (error, results)
-        {
-            if (!results || results.length < 1)
-            {
-                message.reply('No search results found');
-                return;
-            }
-
-            if (musicHandler.upNext)
-            {
-                musicHandler.upNext.songs.push({
-                    url: results[0].link,
-                    title: results[0].title,
-                    requester: message.author,
-                    seek: 0
-                });
-
-                console.log(musicHandler.upNext.songs)
-
-                message.reply(`Added ${results[0].title} to queue`);
-            }
-        });
     }
-    else if (parseInt(request) && parseInt(request) <= musicHandler.opts.maxResults && parseInt(request) > 0)
+    else if (message.content.includes('http'))
     {
-        if (debug) console.log('Message is a prompt for the user');
-
-        if (!MusicHandler.choices || MusicHandler.choices.length < 1) return;
-
-        let choice = MusicHandler.choices[parseInt(request) - 1];
-
-        if (musicHandler.upNext)
-        {
-            musicHandler.upNext.songs.push(
-                {
-                    url: choice.link,
-                    title: choice.title,
-                    requester: message.author,
-                    seek: 0
-                }
-            );
-
-            message.reply(`Added ${choice.title} to queue`);
-        }
+        
     }
     else
     {
-        if (debug) console.log('Message contains a search');
+        contentSearch(message, musicHandler);
+    }
+}
 
-        ytsearch(request, musicHandler.opts, function (error, results) {
-            let options: Option[] = [];
+async function playLink(url: string, musicHandler: MusicHandler)
+{
 
-            if (!results || results.length < 1)
-            {
-                message.reply('No search results found');
-                return;
-            }
-            
-            for (var i = 0; i < musicHandler.opts.maxResults; i++) {
-                options.push(
-                    {
-                        name: `${i + 1}. ${results[i].title}`,
-                        value: `[LINK](${results[i].link})`
-                    }
-                );
-            }
+}
 
-            message.reply({
-                embed: {
-                    color: 3447004,
-                    title: 'Pick one from below',
-                    author: {
-                        name: message.client.user.username,
-                        icon_url: message.client.user.avatarURL
-                    },
-                    fields: options,
-                    timestamp: new Date()
-                }
-            });
-
-            MusicHandler.choices = results;
+function contentSearch(message: Message, musicHandler: MusicHandler)
+{
+    ytsearch(message.content, musicHandler.opts, (error, results) => 
+    {
+        if (error) console.log('Error getting results for: ' + message.content);
+        results!.forEach(x => 
+        {
+            apiResults.push(new Result(x.link));
         });
-    }
+        
+    }).then(() => {querySong(message, musicHandler)});
+}
 
-    if (!musicHandler.upNext!.playing && musicHandler.upNext!.songs.length == 1)
-    {
-        musicHandler.Play(client, musicHandler, message);
-    }
+class Result
+{
+    url: string;
 
-    return new Promise(function (resolve, reject) 
+    constructor(url: string)
     {
-        resolve();
-    });
+        this.url = url;
+    }
 }
