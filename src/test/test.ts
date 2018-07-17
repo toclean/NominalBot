@@ -16,26 +16,29 @@ client.user = new ClientUser(client, {'id': '123'});
 client.users.set(client.user.id, client.user);
 
 let guild = new Guild(client, {'emojis': []});
-let channel = new TextChannel(guild, {});      
-let message = new Message(channel, {'content': ' https://www.youtube.com/watch?v=nYb2B7N1CKU', 'author': client.user, 'embeds': [], 'attachments': []}, client);
-
-
-describe('Adds a song to the queue', () => {
-    it('array should be one larger', async () => {
-        let startSize = mh.upNext!.songs.length;
-        let guild = new Guild(client, {'emojis': []});
-        let channel = new TextChannel(guild, {});
-        
-        await mh.AddSong(client, mh, new Message(channel, {'content': ' https://www.youtube.com/watch?v=nYb2B7N1CKU', 'author': client.user, 'embeds': [], 'attachments': []}, client));
-
-        expect(startSize).to.not.eq(mh.upNext!.songs.length);
-    });
-});
+let channel = new TextChannel(guild, {});
 
 describe('Searching', () => 
 {
-    it('Content searching returns results', async () => 
+    // describe('String Searching', () => 
+    // {
+    //     it('Searching with a string', async () => 
+    //     {      
+    //         let message = new Message(channel, {'content': ' this is a test', 'author': client.user, 'embeds': [], 'attachments': []}, client);
+    //         let startSize = mh.results!.length | 0;
+    //         await mh.AddSong(client, mh, message);
+    //         expect(startSize).to.be.lessThan(mh.results!.length);
+    //     });
+    // });
+    
+    describe('String Searching', () => 
     {
-       mh.AddSong(client, mh, message);
+        it('url should return results', async () => 
+        {        
+            let message = new Message(channel, {'content': ' https://www.youtube.com/watch?v=fXz_AqeJOkE', 'author': client.user, 'embeds': [], 'attachments': []}, client);
+            let startSize = mh.upNext!.songs.length;
+            await mh.AddSong(client, mh, message);
+            expect(startSize).to.be.lessThan(mh.upNext!.songs.length);
+        });
     });
 });

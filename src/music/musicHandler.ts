@@ -2,6 +2,7 @@ import { Client, VoiceConnection, Message, StreamDispatcher } from "discord.js";
 import * as yt from 'ytdl-core';
 import * as ytsearch from 'youtube-search';
 import { UpNext } from "../models/music/upNext";
+import { Result } from "../models/music/Result";
 import { VoiceHandler } from "./voiceHandler";
 
 import { Add } from "../commands/add";
@@ -17,7 +18,8 @@ const { youtubeApi }: { youtubeApi: string } = require('../../config.json');
 export class MusicHandler
 {
     public static choices: ytsearch.YouTubeSearchResults[] | undefined = [];
-    public upNext: UpNext | undefined;
+    public upNext: UpNext;
+    public results: Result[];
     public dispatcher: StreamDispatcher | undefined;
     public voiceHandler: VoiceHandler | undefined;
     public opts = {
@@ -38,6 +40,7 @@ export class MusicHandler
     {
         this.upNext = new UpNext();
         this.voiceHandler = voiceHandler;
+        this.results = [];
     }
 
     public HandleDispatcher(client: Client, message: Message)

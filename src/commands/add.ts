@@ -1,14 +1,10 @@
 import { Client, Message } from "discord.js";
-import { VoiceHandler } from "../music/voiceHandler";
 import { MusicHandler } from "../music/musicHandler";
-import { Option } from "../models/music/option";
 import { Command } from "../models/command";
 import * as ytsearch from "youtube-search"
 
 let { debug }: { debug: boolean } = require('../../config.json');
 debug = (debug === true);
-
-let apiResults: Result[] = [];
 
 export class Add implements Command
 {
@@ -17,57 +13,131 @@ export class Add implements Command
 
     public async AddSong(client: Client, musicHandler: MusicHandler, message: Message)
     {
-        let startSize = musicHandler.upNext!.songs.length;
-
-        await querySong(message, musicHandler);
-
-        return new Promise((resolve, reject) => 
-        {
-            resolve();
-        });
+        await querySong(client, message, musicHandler);
     }
 }
 
-async function querySong(message: Message, musicHandler: MusicHandler)
+async function querySong(client: Client, message: Message, musicHandler: MusicHandler)
 {
-    if (Number.parseInt(message.content) && Number.parseInt(message.content) > 0 && Number.parseInt(message.content) <= musicHandler.opts.maxResults)
-    {
+    let content = message.content.substr(message.content.indexOf(' '));
 
-    }
-    else if (message.content.includes('http'))
+    if (Number.parseInt(content) && Number.parseInt(content) > 0 && Number.parseInt(content) <= musicHandler.opts.maxResults)
     {
-        
+        promptReply(message, musicHandler);
+    }
+    else if (content.startsWith('http'))
+    {
+        await playLink(message, musicHandler);
     }
     else
     {
-        contentSearch(message, musicHandler);
+        await contentSearch(message, musicHandler);
+    }
+
+    if (!musicHandler.upNext!.playing && musicHandler.upNext!.songs.length == 1)
+    {
+        musicHandler.Play(client, musicHandler, message);
     }
 }
 
-async function playLink(url: string, musicHandler: MusicHandler)
+function promptReply(message: Message, musicHandler: MusicHandler)
 {
+    let content = message.content.substr(message.content.indexOf(' '));
+    
+    if (!MusicHandler.choices || MusicHandler.choices.length < 1) return;
 
+    let choice = MusicHandler.choices[parseInt(content) - 1];
+
+    if (musicHandler.upNext)
+    {
+        musicHandler.upNext.songs.push(
+            {
+                url: choice.link,
+                title: choice.title,
+                requester: message.author,
+                seek: 0
+            }
+        );
+
+        message.reply(`Added ${choice.title} to queue`);
+    }
 }
 
-function contentSearch(message: Message, musicHandler: MusicHandler)
+async function playLink(message: Message, musicHandler: MusicHandler)
 {
-    ytsearch(message.content, musicHandler.opts, (error, results) => 
+    return new Promise((resolve, reject) => 
     {
-        if (error) console.log('Error getting results for: ' + message.content);
-        results!.forEach(x => 
+        let id = message.content.split('=')[1];
+
+        ytsearch(id, musicHandler.opts, function (error, results)
         {
-            apiResults.push(new Result(x.link));
+            if (!results || results.length < 1 || error)
+            {
+                message.reply('No search results found');
+                reject();
+            }
+
+            if (musicHandler.upNext)
+            {
+                musicHandler.upNext.songs.push({
+                    url: results![0].link,
+                    title: results![0].title,
+                    requester: message.author,
+                    seek: 0
+                });
+
+                message.reply(`Added ${results![0].title} to queue`);
+            }
+
+            resolve();
         });
-        
-    }).then(() => {querySong(message, musicHandler)});
+    });
 }
 
-class Result
+async function contentSearch(message: Message, musicHandler: MusicHandler)
 {
-    url: string;
+    let content = message.content.substr(message.content.indexOf(' '));
 
-    constructor(url: string)
+    return new Promise((resolve, reject) => 
     {
-        this.url = url;
-    }
+        ytsearch(content, musicHandler.opts, (error, results) => 
+        {
+        
+            if (error || results!.length < 1)
+            {
+                console.log('Error getting results for: ' + content);
+                reject();
+            }
+
+            let i = 0;
+            results!.forEach(x => 
+            {
+                musicHandler.results.push(
+                    {
+                        name: `${i + 1}. ${x.title}`,
+                        value: `[LINK](${x.link})`
+                    }
+                );
+                i++;
+            });
+        
+            message.reply({
+                embed: {
+                    color: 3447004,
+                    title: 'Pick one from below',
+                    author: {
+                        name: message.client.user.username,
+                        icon_url: message.client.user.avatarURL
+                    },
+                    fields: musicHandler.results,
+                    timestamp: new Date()
+                }
+            });
+    
+            MusicHandler.choices = results;
+            musicHandler.results = [];
+
+            resolve();
+        });
+    });
 }

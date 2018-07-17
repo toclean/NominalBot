@@ -1,4 +1,5 @@
 import { Message, Channel, VoiceChannel, VoiceConnection } from "discord.js";
+import { resolve } from "path";
 
 export class VoiceHandler
 {
@@ -7,11 +8,18 @@ export class VoiceHandler
 
     public async ConnectToVoiceChannel(message: Message): Promise<VoiceConnection>
     {
-        this.voiceChannel = message.member.voiceChannel;
-        this.voiceConnection = await this.voiceChannel.join();
-        // if (this.voiceChannel) message.channel.send(`Connected to ${this.voiceChannel.name}`);
+        try
+        {
+            this.voiceChannel = message.member.voiceChannel;
+            this.voiceConnection = await this.voiceChannel.join();
+            // if (this.voiceChannel) message.channel.send(`Connected to ${this.voiceChannel.name}`);
 
-        return this.voiceConnection;
+            return this.voiceConnection;
+        }catch(e)
+        {
+            console.log(e);
+            return new Promise<VoiceConnection>(() => {});
+        }
     }
 
     public LeaveVoiceChannel(message: Message): void
