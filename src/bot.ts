@@ -19,6 +19,7 @@ const client:Client = new Client();
 
 // Connect to the discord server/guild
 client.login(config.botToken);
+console.log(config.botToken)
 
 // Prompt when connected to server
 client.on('ready', () => {
