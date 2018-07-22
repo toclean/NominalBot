@@ -27,7 +27,7 @@ async function querySong(client: Client, message: Message, musicHandler: MusicHa
 
     if (Number.parseInt(content) && Number.parseInt(content) > 0 && Number.parseInt(content) <= musicHandler.opts.maxResults)
     {
-        promptReply(message, musicHandler);
+        await promptReply(message, musicHandler);
     }
     else if (content.startsWith('http'))
     {
@@ -40,33 +40,41 @@ async function querySong(client: Client, message: Message, musicHandler: MusicHa
 
     if (!musicHandler.upNext!.playing && musicHandler.upNext!.songs.length == 1)
     {
-        musicHandler.Play(client, musicHandler, message);
+        await musicHandler.Play(client, musicHandler, message);
     }
 
     return new Promise((resolve, reject) => {resolve();});
 }
 
-function promptReply(message: Message, musicHandler: MusicHandler)
+async function promptReply(message: Message, musicHandler: MusicHandler)
 {
-    let content = message.content.substr(message.content.indexOf(' '));
-    
-    if (!MusicHandler.choices || MusicHandler.choices.length < 1) return;
-
-    let choice = MusicHandler.choices[parseInt(content) - 1];
-
-    if (musicHandler.upNext)
+    return new Promise(async (resolve, reject) => 
     {
-        musicHandler.upNext.songs.push(
-            {
-                url: choice.link,
-                title: choice.title,
-                requester: message.author,
-                seek: 0
-            }
-        );
+        let content = message.content.substr(message.content.indexOf(' '));
+        
+        if (!MusicHandler.choices || MusicHandler.choices.length < 1) return;
 
-        message.reply(`Added ${choice.title} to queue`);
-    }
+        let choice = MusicHandler.choices[parseInt(content) - 1];
+
+        if (musicHandler.upNext)
+        {
+            musicHandler.upNext.songs.push(
+                {
+                    url: choice.link,
+                    title: choice.title,
+                    requester: message.author,
+                    seek: 0
+                }
+            );
+
+
+            setTimeout(() => {
+                message.reply(`Added ${choice.title} to queue`);
+            }, 100);
+        }
+
+        resolve();
+    });
 }
 
 async function playLink(message: Message, musicHandler: MusicHandler)
@@ -79,7 +87,10 @@ async function playLink(message: Message, musicHandler: MusicHandler)
         {
             if (!results || results.length < 1 || error)
             {
-                message.reply('No search results found');
+                setTimeout(() => {
+                    message.reply('No search results found');
+                }, 100);
+                
                 reject();
             }
 
@@ -92,7 +103,9 @@ async function playLink(message: Message, musicHandler: MusicHandler)
                     seek: 0
                 });
 
-                message.reply(`Added ${results![0].title} to queue`);
+                setTimeout(() => {
+                    message.reply(`Added ${results![0].title} to queue`);
+                }, 100);
             }
 
             resolve();
@@ -126,18 +139,20 @@ async function contentSearch(message: Message, musicHandler: MusicHandler)
                 i++;
             });
         
-            message.reply({
-                embed: {
-                    color: 3447004,
-                    title: 'Pick one from below',
-                    author: {
-                        name: message.client.user.username,
-                        icon_url: message.client.user.avatarURL
-                    },
-                    fields: musicHandler.results,
-                    timestamp: new Date()
-                }
-            });
+            setTimeout(() => {
+                message.reply({
+                    embed: {
+                        color: 3447004,
+                        title: 'Pick one from below',
+                        author: {
+                            name: message.client.user.username,
+                            icon_url: message.client.user.avatarURL
+                        },
+                        fields: musicHandler.results,
+                        timestamp: new Date()
+                    }
+                });
+            }, 100);
     
             MusicHandler.choices = results;
             musicHandler.results = [];
