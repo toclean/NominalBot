@@ -13,7 +13,11 @@ export class Add implements Command
 
     public async AddSong(client: Client, musicHandler: MusicHandler, message: Message)
     {
-        await querySong(client, message, musicHandler);
+        return new Promise(async (resolve, reject) => 
+        {
+            await querySong(client, message, musicHandler);
+            resolve();
+        });
     }
 }
 
@@ -38,6 +42,8 @@ async function querySong(client: Client, message: Message, musicHandler: MusicHa
     {
         musicHandler.Play(client, musicHandler, message);
     }
+
+    return new Promise((resolve, reject) => {resolve();});
 }
 
 function promptReply(message: Message, musicHandler: MusicHandler)
@@ -102,7 +108,6 @@ async function contentSearch(message: Message, musicHandler: MusicHandler)
     {
         ytsearch(content, musicHandler.opts, (error, results) => 
         {
-        
             if (error || results!.length < 1)
             {
                 console.log('Error getting results for: ' + content);

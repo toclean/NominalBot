@@ -18,27 +18,29 @@ client.users.set(client.user.id, client.user);
 let guild = new Guild(client, {'emojis': []});
 let channel = new TextChannel(guild, {});
 
-describe('Searching', () => 
+describe('YoutubeAPI', () => 
 {
-    // describe('String Searching', () => 
-    // {
-    //     it('Searching with a string', async () => 
-    //     {      
-    //         let message = new Message(channel, {'content': ' this is a test', 'author': client.user, 'embeds': [], 'attachments': []}, client);
-    //         let startSize = mh.results!.length | 0;
-    //         await mh.AddSong(client, mh, message);
-    //         expect(startSize).to.be.lessThan(mh.results!.length);
-    //     });
-    // });
-    
-describe('String Searching', () => 
+    describe('String Searching', () => 
+    {
+        it('Searching with a string', async () => 
+        {   
+            let message = new Message(channel, {'content': ' this is a test', 'author': client.user, 'embeds': [], 'attachments': []}, client);
+            let startSize = MusicHandler.choices!.length | 0;
+            mh.AddSong(client, mh, message).then(() => {
+                expect(startSize).to.be.lessThan(MusicHandler.choices!.length);
+            });
+        });
+    });
+        
+    describe('String Searching', () => 
     {
         it('url should return results', async () => 
         {        
             let message = new Message(channel, {'content': ' https://www.youtube.com/watch?v=fXz_AqeJOkE', 'author': client.user, 'embeds': [], 'attachments': []}, client);
             let startSize = mh.upNext!.songs.length;
-            await mh.AddSong(client, mh, message);
-            expect(startSize).to.be.lessThan(mh.upNext!.songs.length);
+            mh.AddSong(client, mh, message).then(() => {
+                expect(startSize).to.be.lessThan(mh.upNext!.songs.length);
+            });
         });
     });
 });

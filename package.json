@@ -7,7 +7,9 @@
     "nominalbot": "bot.js"
   },
   "scripts": {
-    "test": "tsc && mocha ./bin/test/test.js"
+    "tsc": "tsc",
+    "tsc:w": "tsc -t esnext -m commonjs src/bot.ts",
+    "test": "mocha -r ts-node/register src/**/test.ts"
   },
   "repository": {
     "type": "git",
@@ -25,11 +27,14 @@
     "discord.js": "^11.3.2",
     "erlpack": "github:discordapp/erlpack",
     "libsodium-wrappers": "^0.7.3",
+    "minimatch": "^3.0.4",
+    "node-gyp": "^3.7.0",
     "node-opus": "^0.2.9",
     "opusscript": "0.0.6",
     "sodium": "^2.0.3",
     "typescript": "^2.9.2",
-    "uws": "^9.14.0",
+    "uws": "^9.148.0",
+    "windows-build-tools": "^3.0.1",
     "youtube-search": "^1.1.1",
     "ytdl-core": "^0.21.0"
   },
@@ -37,6 +42,7 @@
     "@types/chai": "^4.1.4",
     "@types/mocha": "^5.2.5",
     "chai": "^4.1.2",
-    "mocha": "^5.2.0"
+    "mocha": "^5.2.0",
+    "ts-node": "^7.0.0"
   }
 }
